@@ -43,7 +43,8 @@
                             Spacing="4">
                     <Label VerticalAlignment="Center">RFID Serial Number</Label>
                     <TextBlock VerticalAlignment="Center"
-                               FontFamily="monospace" />
+                               FontFamily="monospace"
+                               Text="{Binding CurrentTagUid}" />
                 </StackPanel>
                 <StackPanel Grid.Column="2"
                             Orientation="Horizontal"

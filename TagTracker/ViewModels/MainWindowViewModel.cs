@@ -1,23 +1,24 @@
 ﻿using System.Collections.Generic;
 using System.ComponentModel;
+using System.Linq;
 using TagTracker.Models;
 
 namespace TagTracker.ViewModels;
 
 public class MainWindowViewModel : ViewModelBase
 {
-    private readonly SerialPortModel _serialPortModel = new();
+    private readonly TagReaderModel _tagReaderModel = new();
 
-    private int _selectedBaudRateIndex;
+    private int _selectedBaudRateIndex = 6;
 
     private int _selectedSerialPortIndex;
 
     public MainWindowViewModel()
     {
-        _serialPortModel.PropertyChanged += OnSerialPortsChanged;
+        _tagReaderModel.PropertyChanged += OnTagDataChanged;
     }
 
-    public IEnumerable<string> SerialPorts => _serialPortModel.SerialPorts;
+    public IEnumerable<string> SerialPorts => _tagReaderModel.SerialPorts;
 
     public IEnumerable<int> BaudRates =>
     [
@@ -28,21 +29,40 @@ public class MainWindowViewModel : ViewModelBase
     public int SelectedSerialPortIndex
     {
         get => _selectedSerialPortIndex;
-        set => SetProperty(ref _selectedSerialPortIndex, value);
+        set
+        {
+            SetProperty(ref _selectedSerialPortIndex, value);
+            _tagReaderModel.PortName =
+                SerialPorts.ElementAt(_selectedSerialPortIndex);
+        }
     }
 
     public int SelectedBaudRateIndex
     {
         get => _selectedBaudRateIndex;
-        set => SetProperty(ref _selectedBaudRateIndex, value);
+        set
+        {
+            SetProperty(ref _selectedBaudRateIndex, value);
+            _tagReaderModel.BaudRate =
+                BaudRates.ElementAt(_selectedBaudRateIndex);
+        }
     }
 
-    public bool IsTagPresent => true;
+    public bool IsTagPresent => CurrentTagUid != null;
+    public string? CurrentTagUid => _tagReaderModel.CurrentTagUid;
 
-    private void OnSerialPortsChanged(object? sender,
+    private void OnTagDataChanged(object? sender,
         PropertyChangedEventArgs e)
     {
-        if (e.PropertyName == nameof(_serialPortModel.SerialPorts))
-            OnPropertyChanged(nameof(SerialPorts));
+        switch (e.PropertyName)
+        {
+            case nameof(_tagReaderModel.SerialPorts):
+                OnPropertyChanged(nameof(SerialPorts));
+                break;
+            case nameof(_tagReaderModel.CurrentTagUid):
+                OnPropertyChanged(nameof(CurrentTagUid));
+                OnPropertyChanged(nameof(IsTagPresent));
+                break;
+        }
     }
 }
