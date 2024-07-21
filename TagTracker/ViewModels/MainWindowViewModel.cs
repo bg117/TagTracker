@@ -19,7 +19,7 @@ public partial class MainWindowViewModel : ViewModelBase
 
     [ObservableProperty] private int _selectedSerialPortIndex;
 
-    [ObservableProperty]
+    [ObservableProperty] [NotifyCanExecuteChangedFor(nameof(ConnectCommand))]
     private string[] _serialPorts = SerialPort.GetPortNames();
 
     public MainWindowViewModel()
@@ -41,14 +41,13 @@ public partial class MainWindowViewModel : ViewModelBase
         SerialPorts = SerialPort.GetPortNames();
     }
 
-
     private void OnTagReceived(string tagUid)
     {
         CurrentTagUid = tagUid;
         IsTagPresent = true;
     }
 
-    [RelayCommand]
+    [RelayCommand(CanExecute = nameof(CanConnect))]
     private void Connect()
     {
         _tagReaderModel.Connect(
@@ -56,5 +55,11 @@ public partial class MainWindowViewModel : ViewModelBase
             string.Empty,
             BaudRates.ElementAtOrDefault(SelectedBaudRateIndex)
         );
+    }
+
+    private bool CanConnect()
+    {
+        return !string.IsNullOrEmpty(
+            SerialPorts.ElementAtOrDefault(SelectedSerialPortIndex));
     }
 }
