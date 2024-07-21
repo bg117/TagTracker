@@ -3,6 +3,7 @@
         xmlns:vm="using:TagTracker.ViewModels"
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:converters="clr-namespace:TagTracker.Converters;assembly=TagTracker"
         mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
         x:Class="TagTracker.Views.MainWindow"
         x:DataType="vm:MainWindowViewModel"
@@ -14,7 +15,13 @@
         <vm:MainWindowViewModel />
     </Design.DataContext>
 
-    <Grid RowDefinitions="Auto,8,Auto,8,*">
+    <Window.Resources>
+        <converters:BooleanToConnectDisconnectConverter
+            x:Key="BooleanToConnectDisconnectConverter" />
+    </Window.Resources>
+
+    <Grid RowDefinitions="Auto,12,Auto,8,*"
+          Margin="8">
         <Grid Row="0"
               ColumnDefinitions="Auto,8,Auto,*,Auto">
             <StackPanel Grid.Column="0"
@@ -34,9 +41,8 @@
                           Width="100" />
             </StackPanel>
             <Button Grid.Column="4"
-                    Command="{Binding ConnectCommand}">
-                Connect
-            </Button>
+                    Command="{Binding ConnectOrDisconnectCommand}"
+                    Content="{Binding IsConnected,Converter={StaticResource BooleanToConnectDisconnectConverter}}" />
         </Grid>
         <StackPanel Grid.Row="2">
             <Grid ColumnDefinitions="Auto,8,Auto,8,Auto,*,Auto"
@@ -64,8 +70,8 @@
                 <Button Grid.Column="6">Add to Database</Button>
             </Grid>
             <TextBlock HorizontalAlignment="Center"
-                       IsVisible="{Binding !IsTagPresent}">
-                Scan a tag to set its information
+                       IsVisible="{Binding IsTagPresentXorIsConnected}">
+                Scan a tag to view and modify its information
             </TextBlock>
         </StackPanel>
     </Grid>

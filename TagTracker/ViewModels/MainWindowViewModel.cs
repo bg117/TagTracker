@@ -14,13 +14,17 @@ public partial class MainWindowViewModel : ViewModelBase
 
     [ObservableProperty] private string? _currentTagUid;
 
+    [ObservableProperty] private bool _isConnected;
+
     [ObservableProperty] private bool _isTagPresent;
+    [ObservableProperty] private bool _isTagPresentXorIsConnected;
 
     [ObservableProperty] private int _selectedBaudRateIndex = 6;
 
     [ObservableProperty] private int _selectedSerialPortIndex;
 
-    [ObservableProperty] [NotifyCanExecuteChangedFor(nameof(ConnectCommand))]
+    [ObservableProperty]
+    [NotifyCanExecuteChangedFor(nameof(ConnectOrDisconnectCommand))]
     private string[] _serialPorts = SerialPort.GetPortNames();
 
     public MainWindowViewModel()
@@ -51,9 +55,24 @@ public partial class MainWindowViewModel : ViewModelBase
     {
         CurrentTagUid = tagUid;
         IsTagPresent = true;
+        IsTagPresentXorIsConnected = false;
     }
 
-    [RelayCommand(CanExecute = nameof(CanConnect))]
+    [RelayCommand(CanExecute = nameof(CanConnectOrDisconnect))]
+    private void ConnectOrDisconnect()
+    {
+        if (!IsConnected)
+            Connect();
+        else
+            Disconnect();
+    }
+
+    private bool CanConnectOrDisconnect()
+    {
+        return !string.IsNullOrEmpty(
+            SerialPorts.ElementAtOrDefault(SelectedSerialPortIndex));
+    }
+
     private void Connect()
     {
         _tagReaderModel.Connect(
@@ -61,11 +80,17 @@ public partial class MainWindowViewModel : ViewModelBase
             string.Empty,
             BaudRates.ElementAtOrDefault(SelectedBaudRateIndex)
         );
+        IsConnected = true;
+        IsTagPresent = false;
+        IsTagPresentXorIsConnected = true;
     }
 
-    private bool CanConnect()
+    private void Disconnect()
     {
-        return !string.IsNullOrEmpty(
-            SerialPorts.ElementAtOrDefault(SelectedSerialPortIndex));
+        _tagReaderModel.Disconnect();
+        IsConnected = false;
+        IsTagPresent = false;
+        IsTagPresentXorIsConnected = false;
+        CurrentTagUid = null;
     }
 }
