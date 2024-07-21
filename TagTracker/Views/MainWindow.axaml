@@ -61,7 +61,7 @@
             </Grid>
             <TextBlock HorizontalAlignment="Center"
                        IsVisible="{Binding !IsTagPresent}">
-                Scan a tag
+                Scan a tag to set its information
             </TextBlock>
         </StackPanel>
     </Grid>
