@@ -1,68 +1,60 @@
-﻿using System.Collections.Generic;
-using System.ComponentModel;
+﻿using System.IO.Ports;
 using System.Linq;
+using CommunityToolkit.Mvvm.ComponentModel;
+using CommunityToolkit.Mvvm.Input;
 using TagTracker.Models;
+using Usb.Events;
 
 namespace TagTracker.ViewModels;
 
-public class MainWindowViewModel : ViewModelBase
+public partial class MainWindowViewModel : ViewModelBase
 {
     private readonly TagReaderModel _tagReaderModel = new();
 
-    private int _selectedBaudRateIndex = 6;
+    [ObservableProperty] private string? _currentTagUid;
 
-    private int _selectedSerialPortIndex;
+    [ObservableProperty] private bool _isTagPresent;
+
+    [ObservableProperty] private int _selectedBaudRateIndex = 6;
+
+    [ObservableProperty] private int _selectedSerialPortIndex;
+
+    [ObservableProperty]
+    private string[] _serialPorts = SerialPort.GetPortNames();
 
     public MainWindowViewModel()
     {
-        _tagReaderModel.PropertyChanged += OnTagDataChanged;
+        _tagReaderModel.TagReceived += OnTagReceived;
+        Program.UsbEventWatcher.UsbDeviceAdded += OnUsbDevicesChanged;
+        Program.UsbEventWatcher.UsbDeviceRemoved += OnUsbDevicesChanged;
     }
 
-    public IEnumerable<string> SerialPorts => _tagReaderModel.SerialPorts;
 
-    public IEnumerable<int> BaudRates =>
+    public int[] BaudRates =>
     [
         110, 300, 600, 1200, 2400, 4800, 9600, 14400, 19200, 38400, 57600,
         115200
     ];
 
-    public int SelectedSerialPortIndex
+    private void OnUsbDevicesChanged(object? sender, UsbDevice e)
     {
-        get => _selectedSerialPortIndex;
-        set
-        {
-            SetProperty(ref _selectedSerialPortIndex, value);
-            _tagReaderModel.PortName =
-                SerialPorts.ElementAt(_selectedSerialPortIndex);
-        }
+        SerialPorts = SerialPort.GetPortNames();
     }
 
-    public int SelectedBaudRateIndex
+
+    private void OnTagReceived(string tagUid)
     {
-        get => _selectedBaudRateIndex;
-        set
-        {
-            SetProperty(ref _selectedBaudRateIndex, value);
-            _tagReaderModel.BaudRate =
-                BaudRates.ElementAt(_selectedBaudRateIndex);
-        }
+        CurrentTagUid = tagUid;
+        IsTagPresent = true;
     }
 
-    public bool IsTagPresent => CurrentTagUid != null;
-    public string? CurrentTagUid => _tagReaderModel.CurrentTagUid;
-
-    private void OnTagDataChanged(object? sender,
-        PropertyChangedEventArgs e)
+    [RelayCommand]
+    private void Connect()
     {
-        switch (e.PropertyName)
-        {
-            case nameof(_tagReaderModel.SerialPorts):
-                OnPropertyChanged(nameof(SerialPorts));
-                break;
-            case nameof(_tagReaderModel.CurrentTagUid):
-                OnPropertyChanged(nameof(CurrentTagUid));
-                OnPropertyChanged(nameof(IsTagPresent));
-                break;
-        }
+        _tagReaderModel.Connect(
+            SerialPorts.ElementAtOrDefault(SelectedSerialPortIndex) ??
+            string.Empty,
+            BaudRates.ElementAtOrDefault(SelectedBaudRateIndex)
+        );
     }
 }

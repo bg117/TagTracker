@@ -1,59 +1,23 @@
-using System.Collections.Generic;
 using System.IO.Ports;
 using System.Text.RegularExpressions;
-using CommunityToolkit.Mvvm.ComponentModel;
-using Usb.Events;
 
 namespace TagTracker.Models;
 
-public partial class TagReaderModel : ObservableObject
+public delegate void TagReceivedEventHandler(string tagUid);
+
+public partial class TagReaderModel
 {
     private readonly SerialPort _serialPort = new();
-    private int _baudRate;
 
-    private string? _currentTagUid;
+    public event TagReceivedEventHandler? TagReceived;
 
-    private string _portName = string.Empty;
-
-    public TagReaderModel()
-    {
-        Program.UsbEventWatcher.UsbDeviceAdded += OnUsbDevicesChanged;
-        Program.UsbEventWatcher.UsbDeviceRemoved += OnUsbDevicesChanged;
-    }
-
-    public IEnumerable<string> SerialPorts
-        => SerialPort.GetPortNames();
-
-    public string PortName
-    {
-        get => _portName;
-        set => SetProperty(ref _portName, value);
-    }
-
-    public int BaudRate
-    {
-        get => _baudRate;
-        set => SetProperty(ref _baudRate, value);
-    }
-
-    public string? CurrentTagUid
-    {
-        get => _currentTagUid;
-        set => SetProperty(ref _currentTagUid, value);
-    }
-
-    private void OnUsbDevicesChanged(object? sender, UsbDevice e)
-    {
-        OnPropertyChanged(nameof(SerialPorts));
-    }
-
-    public void Connect()
+    public void Connect(string portName, int baudRate)
     {
         // check if the port is already open
         Disconnect();
 
-        _serialPort.PortName = PortName;
-        _serialPort.BaudRate = BaudRate;
+        _serialPort.PortName = portName;
+        _serialPort.BaudRate = baudRate;
         _serialPort.DataReceived += OnDataReceived;
         _serialPort.Open();
     }
@@ -66,7 +30,7 @@ public partial class TagReaderModel : ObservableObject
         var match = regex.Match(input ?? string.Empty);
 
         if (match.Success)
-            CurrentTagUid = match.Value;
+            TagReceived?.Invoke(match.Value);
     }
 
     public void Disconnect()

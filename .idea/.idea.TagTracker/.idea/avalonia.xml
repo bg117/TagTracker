@@ -3,6 +3,7 @@
   <component name="AvaloniaProject">
     <option name="projectPerEditor">
       <map>
+        <entry key="TagTracker/App.axaml" value="TagTracker/TagTracker.csproj" />
         <entry key="TagTracker/Views/MainWindow.axaml" value="TagTracker/TagTracker.csproj" />
       </map>
     </option>

@@ -33,7 +33,10 @@
                           SelectedIndex="{Binding SelectedBaudRateIndex}"
                           Width="100" />
             </StackPanel>
-            <Button Grid.Column="4">Connect</Button>
+            <Button Grid.Column="4"
+                    Command="{Binding ConnectCommand}">
+                Connect
+            </Button>
         </Grid>
         <StackPanel Grid.Row="2">
             <Grid ColumnDefinitions="Auto,8,Auto,8,Auto,*,Auto"
