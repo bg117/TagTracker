@@ -21,7 +21,9 @@ public partial class MainWindowViewModel : ViewModelBase
 
     [ObservableProperty] private int _selectedBaudRateIndex = 6;
 
-    [ObservableProperty] private int _selectedSerialPortIndex;
+    [ObservableProperty]
+    [NotifyCanExecuteChangedFor(nameof(ConnectOrDisconnectCommand))]
+    private int _selectedSerialPortIndex;
 
     [ObservableProperty]
     [NotifyCanExecuteChangedFor(nameof(ConnectOrDisconnectCommand))]
