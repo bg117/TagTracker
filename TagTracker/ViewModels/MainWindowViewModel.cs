@@ -37,6 +37,8 @@ public class MainWindowViewModel : ViewModelBase
         set => SetProperty(ref _selectedBaudRateIndex, value);
     }
 
+    public bool IsTagPresent => true;
+
     private void OnSerialPortsChanged(object? sender,
         PropertyChangedEventArgs e)
     {

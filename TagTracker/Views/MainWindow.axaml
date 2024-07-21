@@ -14,18 +14,18 @@
         <vm:MainWindowViewModel />
     </Design.DataContext>
 
-    <StackPanel Orientation="Vertical" Margin="8">
-        <Grid ColumnDefinitions="Auto,Auto,*,Auto">
+    <Grid RowDefinitions="Auto,8,Auto,8,*">
+        <Grid Row="0"
+              ColumnDefinitions="Auto,8,Auto,*,Auto">
             <StackPanel Grid.Column="0"
                         Orientation="Horizontal"
-                        Spacing="4"
-                        Margin="0 0 8 0">
+                        Spacing="4">
                 <Label VerticalAlignment="Center">Serial Port</Label>
                 <ComboBox ItemsSource="{Binding SerialPorts}"
                           SelectedIndex="{Binding SelectedSerialPortIndex}"
                           Width="150" />
             </StackPanel>
-            <StackPanel Grid.Column="1"
+            <StackPanel Grid.Column="2"
                         Orientation="Horizontal"
                         Spacing="4">
                 <Label VerticalAlignment="Center">Baud Rate</Label>
@@ -33,8 +33,36 @@
                           SelectedIndex="{Binding SelectedBaudRateIndex}"
                           Width="100" />
             </StackPanel>
-            <Button Grid.Column="3">Connect</Button>
+            <Button Grid.Column="4">Connect</Button>
         </Grid>
-        <StackPanel Orientation="Horizontal" />
-    </StackPanel>
+        <StackPanel Grid.Row="2">
+            <Grid ColumnDefinitions="Auto,8,Auto,8,Auto,*,Auto"
+                  IsVisible="{Binding IsTagPresent}">
+                <StackPanel Grid.Column="0"
+                            Orientation="Horizontal"
+                            Spacing="4">
+                    <Label VerticalAlignment="Center">RFID Serial Number</Label>
+                    <TextBlock VerticalAlignment="Center"
+                               FontFamily="monospace" />
+                </StackPanel>
+                <StackPanel Grid.Column="2"
+                            Orientation="Horizontal"
+                            Spacing="4">
+                    <Label VerticalAlignment="Center">Name</Label>
+                    <TextBox Width="200" />
+                </StackPanel>
+                <StackPanel Grid.Column="4"
+                            Orientation="Horizontal"
+                            Spacing="4">
+                    <Label VerticalAlignment="Center">LRN</Label>
+                    <TextBox Width="200" />
+                </StackPanel>
+                <Button Grid.Column="6">Add to Database</Button>
+            </Grid>
+            <TextBlock HorizontalAlignment="Center"
+                       IsVisible="{Binding !IsTagPresent}">
+                Scan a tag
+            </TextBlock>
+        </StackPanel>
+    </Grid>
 </Window>
