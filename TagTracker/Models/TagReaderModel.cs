@@ -16,8 +16,8 @@ public partial class TagReaderModel
         // check if the port is already open
         Disconnect();
 
-        _serialPort.PortName = portName;
-        _serialPort.BaudRate = baudRate;
+        _serialPort.PortName     =  portName;
+        _serialPort.BaudRate     =  baudRate;
         _serialPort.DataReceived += OnDataReceived;
         _serialPort.Open();
     }
