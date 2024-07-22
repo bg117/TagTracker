@@ -1,4 +1,5 @@
-﻿using System.IO.Ports;
+﻿using System.Collections.ObjectModel;
+using System.IO.Ports;
 using System.Linq;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
@@ -12,12 +13,14 @@ public partial class MainWindowViewModel : ViewModelBase
     private readonly TagReaderModel _tagReaderModel = new();
     private readonly IUsbEventWatcher _usbEventWatcher = new UsbEventWatcher();
 
-    [ObservableProperty] private string? _currentTagUid;
+    [ObservableProperty]
+    [NotifyPropertyChangedFor(nameof(IsTagPresent))]
+    [NotifyPropertyChangedFor(nameof(IsConnectedXorTagPresent))]
+    private string? _currentTagUid;
 
-    [ObservableProperty] private bool _isConnected;
-
-    [ObservableProperty] private bool _isTagPresent;
-    [ObservableProperty] private bool _isTagPresentXorIsConnected;
+    [ObservableProperty]
+    [NotifyPropertyChangedFor(nameof(IsConnectedXorTagPresent))]
+    private bool _isConnected;
 
     [ObservableProperty] private int _selectedBaudRateIndex = 6;
 
@@ -29,12 +32,20 @@ public partial class MainWindowViewModel : ViewModelBase
     [NotifyCanExecuteChangedFor(nameof(ConnectOrDisconnectCommand))]
     private string[] _serialPorts = SerialPort.GetPortNames();
 
+    [ObservableProperty] private ObservableCollection<Tag> _tags;
+
     public MainWindowViewModel()
     {
         _tagReaderModel.TagReceived += OnTagReceived;
         _usbEventWatcher.UsbDeviceAdded += OnUsbDevicesChanged;
         _usbEventWatcher.UsbDeviceRemoved += OnUsbDevicesChanged;
+
+        using var context = new TagContext();
+        _tags = new ObservableCollection<Tag>(context.Tags);
     }
+
+    public bool IsTagPresent => CurrentTagUid != null;
+    public bool IsConnectedXorTagPresent => IsConnected != IsTagPresent;
 
     public int[] BaudRates =>
     [
@@ -56,8 +67,6 @@ public partial class MainWindowViewModel : ViewModelBase
     private void OnTagReceived(string tagUid)
     {
         CurrentTagUid = tagUid;
-        IsTagPresent = true;
-        IsTagPresentXorIsConnected = false;
     }
 
     [RelayCommand(CanExecute = nameof(CanConnectOrDisconnect))]
@@ -83,16 +92,12 @@ public partial class MainWindowViewModel : ViewModelBase
             BaudRates.ElementAtOrDefault(SelectedBaudRateIndex)
         );
         IsConnected = true;
-        IsTagPresent = false;
-        IsTagPresentXorIsConnected = true;
     }
 
     private void Disconnect()
     {
         _tagReaderModel.Disconnect();
         IsConnected = false;
-        IsTagPresent = false;
-        IsTagPresentXorIsConnected = false;
         CurrentTagUid = null;
     }
 }

@@ -70,9 +70,19 @@
                 <Button Grid.Column="6">Add to Database</Button>
             </Grid>
             <TextBlock HorizontalAlignment="Center"
-                       IsVisible="{Binding IsTagPresentXorIsConnected}">
+                       IsVisible="{Binding IsConnectedXorTagPresent}">
                 Scan a tag to view and modify its information
             </TextBlock>
         </StackPanel>
+        <DataGrid Grid.Row="4"
+                  ItemsSource="{Binding Tags}"
+                  AutoGenerateColumns="False">
+            <DataGrid.Columns>
+                <DataGridTextColumn Binding="{Binding Uid}" Header="UID" />
+                <DataGridTextColumn Binding="{Binding FullName}"
+                                    Header="Full Name" />
+                <DataGridTextColumn Binding="{Binding Lrn}" Header="LRN" />
+            </DataGrid.Columns>
+        </DataGrid>
     </Grid>
 </Window>
