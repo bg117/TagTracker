@@ -1,6 +1,7 @@
 ﻿using System.Collections.ObjectModel;
 using System.IO.Ports;
 using System.Linq;
+using Avalonia.Threading;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using TagTracker.Models;
@@ -10,7 +11,7 @@ namespace TagTracker.ViewModels;
 
 public partial class MainWindowViewModel : ViewModelBase
 {
-    private readonly TagReaderModel _tagReaderModel = new();
+    private readonly TagReaderModel   _tagReaderModel  = new();
     private readonly IUsbEventWatcher _usbEventWatcher = new UsbEventWatcher();
 
     [ObservableProperty]
@@ -22,7 +23,8 @@ public partial class MainWindowViewModel : ViewModelBase
     [NotifyPropertyChangedFor(nameof(IsConnectedXorTagPresent))]
     private bool _isConnected;
 
-    [ObservableProperty] private int _selectedBaudRateIndex = 6;
+    [ObservableProperty]
+    private int _selectedBaudRateIndex = 6;
 
     [ObservableProperty]
     [NotifyCanExecuteChangedFor(nameof(ConnectOrDisconnectCommand))]
@@ -32,20 +34,21 @@ public partial class MainWindowViewModel : ViewModelBase
     [NotifyCanExecuteChangedFor(nameof(ConnectOrDisconnectCommand))]
     private string[] _serialPorts = SerialPort.GetPortNames();
 
-    [ObservableProperty] private ObservableCollection<Tag> _tags;
+    [ObservableProperty]
+    private ObservableCollection<Tag> _tags;
 
     public MainWindowViewModel()
     {
-        _tagReaderModel.TagReceived += OnTagReceived;
-        _usbEventWatcher.UsbDeviceAdded += OnUsbDevicesChanged;
+        _tagReaderModel.TagReceived       += OnTagReceived;
+        _usbEventWatcher.UsbDeviceAdded   += OnUsbDevicesChanged;
         _usbEventWatcher.UsbDeviceRemoved += OnUsbDevicesChanged;
 
         using var context = new TagContext();
         _tags = new ObservableCollection<Tag>(context.Tags);
     }
 
-    public bool IsTagPresent => CurrentTagUid != null;
-    public bool IsConnectedXorTagPresent => IsConnected != IsTagPresent;
+    public bool IsTagPresent             => CurrentTagUid != null;
+    public bool IsConnectedXorTagPresent => IsConnected   != IsTagPresent;
 
     public int[] BaudRates =>
     [
@@ -61,7 +64,8 @@ public partial class MainWindowViewModel : ViewModelBase
 
     private void OnUsbDevicesChanged(object? sender, UsbDevice e)
     {
-        SerialPorts = SerialPort.GetPortNames();
+        Dispatcher.UIThread.InvokeAsync(() => SerialPorts =
+                                                  SerialPort.GetPortNames());
     }
 
     private void OnTagReceived(string tagUid)
@@ -80,24 +84,22 @@ public partial class MainWindowViewModel : ViewModelBase
 
     private bool CanConnectOrDisconnect()
     {
-        return !string.IsNullOrEmpty(
-            SerialPorts.ElementAtOrDefault(SelectedSerialPortIndex));
+        return !string.IsNullOrEmpty(SerialPorts
+                                        .ElementAtOrDefault(SelectedSerialPortIndex));
     }
 
     private void Connect()
     {
-        _tagReaderModel.Connect(
-            SerialPorts.ElementAtOrDefault(SelectedSerialPortIndex) ??
-            string.Empty,
-            BaudRates.ElementAtOrDefault(SelectedBaudRateIndex)
-        );
+        _tagReaderModel
+           .Connect(SerialPorts.ElementAtOrDefault(SelectedSerialPortIndex) ?? string.Empty,
+                    BaudRates.ElementAtOrDefault(SelectedBaudRateIndex));
         IsConnected = true;
     }
 
     private void Disconnect()
     {
         _tagReaderModel.Disconnect();
-        IsConnected = false;
+        IsConnected   = false;
         CurrentTagUid = null;
     }
 }
