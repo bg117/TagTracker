@@ -10,7 +10,7 @@ public sealed class TagContext : DbContext
     {
         var local  = Environment.SpecialFolder.LocalApplicationData;
         var folder = Environment.GetFolderPath(local);
-        DatabasePath = Path.Combine(folder, "tags.db");
+        DatabasePath = Path.Combine(folder, "TagTracker", "tags.db");
         Database.EnsureCreated();
     }
 
