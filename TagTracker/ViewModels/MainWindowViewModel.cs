@@ -31,6 +31,9 @@ public partial class MainWindowViewModel : ViewModelBase
     private bool _isConnected;
 
     [ObservableProperty]
+    private bool _isSerialMonitorOpen;
+
+    [ObservableProperty]
     [NotifyCanExecuteChangedFor(nameof(UpsertTagCommand))]
     private string _lrn = string.Empty;
 
@@ -123,8 +126,9 @@ public partial class MainWindowViewModel : ViewModelBase
     private void Disconnect()
     {
         _tagReaderModel.Disconnect();
-        IsConnected   = false;
-        CurrentTagUid = null;
+        IsConnected         = false;
+        CurrentTagUid       = null;
+        IsSerialMonitorOpen = false;
     }
 
     [RelayCommand(CanExecute = nameof(CanUpsertTag))]

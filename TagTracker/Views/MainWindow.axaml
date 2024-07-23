@@ -18,6 +18,8 @@
     <Window.Resources>
         <converters:BooleanToConnectDisconnectConverter
             x:Key="BooleanToConnectDisconnectConverter" />
+        <converters:BooleanToGridRowSpanConverter
+            x:Key="BooleanToGridRowSpanConverter" />
     </Window.Resources>
 
     <Grid RowDefinitions="Auto,12,Auto,8,*,Auto,*"
@@ -43,7 +45,11 @@
             <Button Grid.Column="4"
                     Command="{Binding ConnectOrDisconnectCommand}"
                     Content="{Binding IsConnected,Converter={StaticResource BooleanToConnectDisconnectConverter}}" />
-            <Button Grid.Column="6">Serial Monitor</Button>
+            <ToggleButton Grid.Column="6"
+                          IsChecked="{Binding IsSerialMonitorOpen}"
+                          IsEnabled="{Binding IsConnected}">
+                Serial Monitor
+            </ToggleButton>
         </Grid>
         <StackPanel Grid.Row="2">
             <Grid ColumnDefinitions="Auto,8,Auto,8,Auto,*,Auto"
@@ -81,6 +87,7 @@
             </TextBlock>
         </StackPanel>
         <DataGrid Grid.Row="4"
+                  Grid.RowSpan="{Binding IsSerialMonitorOpen,Converter={StaticResource BooleanToGridRowSpanConverter}}"
                   ItemsSource="{Binding Tags}"
                   AutoGenerateColumns="False">
             <DataGrid.Columns>
@@ -94,9 +101,11 @@
                       ResizeDirection="Rows"
                       Height="3"
                       Margin="0 2"
-                      Background="Gray" />
+                      Background="Gray"
+                      IsVisible="{Binding IsSerialMonitorOpen}" />
         <TextBox Grid.Row="6"
                  IsReadOnly="True"
-                 FontFamily="monospace" />
+                 FontFamily="monospace"
+                 IsVisible="{Binding IsSerialMonitorOpen}" />
     </Grid>
 </Window>
