@@ -4,6 +4,7 @@ using System.Linq;
 using Avalonia.Threading;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
+using Microsoft.EntityFrameworkCore;
 using TagTracker.Models;
 using Usb.Events;
 
@@ -11,8 +12,9 @@ namespace TagTracker.ViewModels;
 
 public partial class MainWindowViewModel : ViewModelBase
 {
-    private readonly TagReaderModel   _tagReaderModel  = new();
-    private readonly IUsbEventWatcher _usbEventWatcher = new UsbEventWatcher();
+    private readonly TagContext      _tagContext      = new();
+    private readonly TagReaderModel  _tagReaderModel  = new();
+    private readonly UsbEventWatcher _usbEventWatcher = new();
 
     [ObservableProperty]
     [NotifyPropertyChangedFor(nameof(IsTagPresent))]
@@ -35,7 +37,7 @@ public partial class MainWindowViewModel : ViewModelBase
     private string[] _serialPorts = SerialPort.GetPortNames();
 
     [ObservableProperty]
-    private ObservableCollection<Tag> _tags;
+    private ObservableCollection<Tag> _tags = [];
 
     public MainWindowViewModel()
     {
@@ -43,8 +45,11 @@ public partial class MainWindowViewModel : ViewModelBase
         _usbEventWatcher.UsbDeviceAdded   += OnUsbDevicesChanged;
         _usbEventWatcher.UsbDeviceRemoved += OnUsbDevicesChanged;
 
-        using var context = new TagContext();
-        _tags = new ObservableCollection<Tag>(context.Tags);
+        Dispatcher.UIThread.InvokeAsync(async () =>
+        {
+            await _tagContext.Tags.LoadAsync();
+            Tags = _tagContext.Tags.Local.ToObservableCollection();
+        });
     }
 
     public bool IsTagPresent             => CurrentTagUid != null;
