@@ -59,13 +59,15 @@
                             Orientation="Horizontal"
                             Spacing="4">
                     <Label VerticalAlignment="Center">Name</Label>
-                    <TextBox Width="200" />
+                    <TextBox Width="200"
+                             Text="{Binding FullName}" />
                 </StackPanel>
                 <StackPanel Grid.Column="4"
                             Orientation="Horizontal"
                             Spacing="4">
                     <Label VerticalAlignment="Center">LRN</Label>
-                    <TextBox Width="200" />
+                    <TextBox Width="200"
+                             Text="{Binding Lrn}" />
                 </StackPanel>
                 <Button Grid.Column="6">Update Tag Information</Button>
             </Grid>

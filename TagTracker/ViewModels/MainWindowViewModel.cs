@@ -22,8 +22,14 @@ public partial class MainWindowViewModel : ViewModelBase
     private string? _currentTagUid;
 
     [ObservableProperty]
+    private string _fullName = string.Empty;
+
+    [ObservableProperty]
     [NotifyPropertyChangedFor(nameof(IsConnectedXorTagPresent))]
     private bool _isConnected;
+
+    [ObservableProperty]
+    private string _lrn = string.Empty;
 
     [ObservableProperty]
     private int _selectedBaudRateIndex = 6;
@@ -67,15 +73,22 @@ public partial class MainWindowViewModel : ViewModelBase
         _usbEventWatcher.Dispose();
     }
 
-    private void OnUsbDevicesChanged(object? sender, UsbDevice e)
+    private async void OnUsbDevicesChanged(object? sender, UsbDevice e)
     {
-        Dispatcher.UIThread.InvokeAsync(() => SerialPorts =
-                                                  SerialPort.GetPortNames());
+        await Dispatcher.UIThread.InvokeAsync(() => SerialPorts =
+                                                        SerialPort.GetPortNames());
     }
 
-    private void OnTagReceived(string tagUid)
+    private async void OnTagReceived(string tagUid)
     {
         CurrentTagUid = tagUid;
+
+        // check if tag is in database; if yes, set FullName and Lrn
+        // if not, string.Empty both
+        var tag = await _tagContext.Tags
+                                   .FirstOrDefaultAsync(t => t.Uid == tagUid);
+        FullName = tag?.FullName ?? string.Empty;
+        Lrn      = tag?.Lrn      ?? string.Empty;
     }
 
     [RelayCommand(CanExecute = nameof(CanConnectOrDisconnect))]
