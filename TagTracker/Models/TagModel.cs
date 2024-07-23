@@ -1,13 +1,19 @@
 using System.ComponentModel.DataAnnotations;
+using CommunityToolkit.Mvvm.ComponentModel;
 
 namespace TagTracker.Models;
 
-public class Tag
+public partial class Tag : ObservableObject
 {
+    [ObservableProperty]
+    private string _fullName = string.Empty;
+
+    [ObservableProperty]
+    private string _lrn = string.Empty;
+
+    [ObservableProperty]
+    private string _uid = string.Empty;
+
     [Key]
     public int Id { get; set; }
-
-    public string Uid      { get; set; } = string.Empty;
-    public string FullName { get; set; } = string.Empty;
-    public string Lrn      { get; set; } = string.Empty;
 }
