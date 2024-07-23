@@ -69,7 +69,10 @@
                     <TextBox Width="200"
                              Text="{Binding Lrn}" />
                 </StackPanel>
-                <Button Grid.Column="6">Update Tag Information</Button>
+                <Button Grid.Column="6"
+                        Command="{Binding UpsertTagCommand}">
+                    Update Tag Information
+                </Button>
             </Grid>
             <TextBlock HorizontalAlignment="Center"
                        IsVisible="{Binding IsConnectedXorTagPresent}">

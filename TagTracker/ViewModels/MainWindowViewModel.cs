@@ -1,6 +1,7 @@
 ﻿using System.Collections.ObjectModel;
 using System.IO.Ports;
 using System.Linq;
+using System.Threading.Tasks;
 using Avalonia.Threading;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
@@ -22,6 +23,7 @@ public partial class MainWindowViewModel : ViewModelBase
     private string? _currentTagUid;
 
     [ObservableProperty]
+    [NotifyCanExecuteChangedFor(nameof(UpsertTagCommand))]
     private string _fullName = string.Empty;
 
     [ObservableProperty]
@@ -29,6 +31,7 @@ public partial class MainWindowViewModel : ViewModelBase
     private bool _isConnected;
 
     [ObservableProperty]
+    [NotifyCanExecuteChangedFor(nameof(UpsertTagCommand))]
     private string _lrn = string.Empty;
 
     [ObservableProperty]
@@ -87,8 +90,11 @@ public partial class MainWindowViewModel : ViewModelBase
         // if not, string.Empty both
         var tag = await _tagContext.Tags
                                    .FirstOrDefaultAsync(t => t.Uid == tagUid);
-        FullName = tag?.FullName ?? string.Empty;
-        Lrn      = tag?.Lrn      ?? string.Empty;
+        await Dispatcher.UIThread.InvokeAsync(() =>
+        {
+            FullName = tag?.FullName ?? string.Empty;
+            Lrn      = tag?.Lrn      ?? string.Empty;
+        });
     }
 
     [RelayCommand(CanExecute = nameof(CanConnectOrDisconnect))]
@@ -119,5 +125,37 @@ public partial class MainWindowViewModel : ViewModelBase
         _tagReaderModel.Disconnect();
         IsConnected   = false;
         CurrentTagUid = null;
+    }
+
+    [RelayCommand(CanExecute = nameof(CanUpsertTag))]
+    private async Task UpsertTag()
+    {
+        var tag = new Tag
+                  {
+                      Uid = CurrentTagUid ?? string.Empty, FullName = FullName, Lrn = Lrn
+                  };
+
+        // if tag is already in database, update it; if not, add it
+        if (Tags.Any(t => t.Uid == tag.Uid))
+        {
+            var entry = _tagContext.Tags.Single(t => t.Uid == tag.Uid);
+            entry.FullName = tag.FullName;
+            entry.Lrn      = tag.Lrn;
+
+            // remove and re-add to update the UI
+            Tags.Remove(tag);
+            Tags.Add(tag);
+        }
+        else
+        {
+            _tagContext.Tags.Add(tag); // automagically updates the ObservableCollection
+        }
+
+        await _tagContext.SaveChangesAsync();
+    }
+
+    private bool CanUpsertTag()
+    {
+        return !string.IsNullOrEmpty(FullName) && !string.IsNullOrEmpty(Lrn);
     }
 }
