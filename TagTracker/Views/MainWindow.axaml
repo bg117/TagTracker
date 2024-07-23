@@ -3,18 +3,110 @@
         xmlns:vm="using:TagTracker.ViewModels"
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:converters="clr-namespace:TagTracker.Converters;assembly=TagTracker"
         mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
         x:Class="TagTracker.Views.MainWindow"
         x:DataType="vm:MainWindowViewModel"
-        Icon="/Assets/avalonia-logo.ico"
         Title="TagTracker">
 
     <Design.DataContext>
         <!-- This only sets the DataContext for the previewer in an IDE,
              to set the actual DataContext for runtime, set the DataContext property in code (look at App.axaml.cs) -->
-        <vm:MainWindowViewModel/>
+        <vm:MainWindowViewModel />
     </Design.DataContext>
 
-    <TextBlock Text="{Binding Greeting}" HorizontalAlignment="Center" VerticalAlignment="Center"/>
+    <Window.Resources>
+        <converters:BooleanToConnectDisconnectConverter
+            x:Key="BooleanToConnectDisconnectConverter" />
+        <converters:BooleanToGridRowSpanConverter
+            x:Key="BooleanToGridRowSpanConverter" />
+    </Window.Resources>
 
+    <Grid RowDefinitions="Auto,12,Auto,8,*,Auto,*"
+          Margin="8">
+        <Grid Row="0"
+              ColumnDefinitions="Auto,8,Auto,*,Auto,8,Auto">
+            <StackPanel Grid.Column="0"
+                        Orientation="Horizontal"
+                        Spacing="4">
+                <Label VerticalAlignment="Center">Serial Port</Label>
+                <ComboBox ItemsSource="{Binding SerialPorts}"
+                          SelectedIndex="{Binding SelectedSerialPortIndex}"
+                          Width="150" />
+            </StackPanel>
+            <StackPanel Grid.Column="2"
+                        Orientation="Horizontal"
+                        Spacing="4">
+                <Label VerticalAlignment="Center">Baud Rate</Label>
+                <ComboBox ItemsSource="{Binding BaudRates}"
+                          SelectedIndex="{Binding SelectedBaudRateIndex}"
+                          Width="100" />
+            </StackPanel>
+            <Button Grid.Column="4"
+                    Command="{Binding ConnectOrDisconnectCommand}"
+                    Content="{Binding IsConnected,Converter={StaticResource BooleanToConnectDisconnectConverter}}" />
+            <ToggleButton Grid.Column="6"
+                          IsChecked="{Binding IsSerialMonitorOpen}"
+                          IsEnabled="{Binding IsConnected}">
+                Serial Monitor
+            </ToggleButton>
+        </Grid>
+        <StackPanel Grid.Row="2">
+            <Grid ColumnDefinitions="Auto,8,Auto,8,Auto,*,Auto"
+                  IsVisible="{Binding IsTagPresent}">
+                <StackPanel Grid.Column="0"
+                            Orientation="Horizontal"
+                            Spacing="4">
+                    <Label VerticalAlignment="Center">RFID UID</Label>
+                    <TextBlock VerticalAlignment="Center"
+                               FontFamily="monospace"
+                               Text="{Binding CurrentTagUid}" />
+                </StackPanel>
+                <StackPanel Grid.Column="2"
+                            Orientation="Horizontal"
+                            Spacing="4">
+                    <Label VerticalAlignment="Center">Name</Label>
+                    <TextBox Width="200"
+                             Text="{Binding FullName}" />
+                </StackPanel>
+                <StackPanel Grid.Column="4"
+                            Orientation="Horizontal"
+                            Spacing="4">
+                    <Label VerticalAlignment="Center">LRN</Label>
+                    <TextBox Width="200"
+                             Text="{Binding Lrn}" />
+                </StackPanel>
+                <Button Grid.Column="6"
+                        Command="{Binding UpsertTagCommand}">
+                    Update Tag Information
+                </Button>
+            </Grid>
+            <TextBlock HorizontalAlignment="Center"
+                       IsVisible="{Binding IsConnectedXorTagPresent}">
+                Scan a tag to view and modify its information
+            </TextBlock>
+        </StackPanel>
+        <DataGrid Grid.Row="4"
+                  Grid.RowSpan="{Binding IsSerialMonitorOpen,Converter={StaticResource BooleanToGridRowSpanConverter}}"
+                  ItemsSource="{Binding Tags}"
+                  AutoGenerateColumns="False">
+            <DataGrid.Columns>
+                <DataGridTextColumn Binding="{Binding Uid}" Header="UID" />
+                <DataGridTextColumn Binding="{Binding FullName}"
+                                    Header="Full Name" />
+                <DataGridTextColumn Binding="{Binding Lrn}" Header="LRN" />
+            </DataGrid.Columns>
+        </DataGrid>
+        <GridSplitter Grid.Row="5"
+                      ResizeDirection="Rows"
+                      Height="3"
+                      Margin="0 2"
+                      Background="Gray"
+                      IsVisible="{Binding IsSerialMonitorOpen}" />
+        <TextBox Grid.Row="6"
+                 IsReadOnly="True"
+                 FontFamily="monospace"
+                 IsVisible="{Binding IsSerialMonitorOpen}"
+                 Text="{Binding SerialMonitorData}" />
+    </Grid>
 </Window>
