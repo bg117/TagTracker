@@ -133,25 +133,21 @@ public partial class MainWindowViewModel : ViewModelBase
     [RelayCommand(CanExecute = nameof(CanUpsertTag))]
     private async Task UpsertTag()
     {
-        var tag = new Tag
-                  {
-                      Uid = CurrentTagUid ?? string.Empty, FullName = FullName, Lrn = Lrn
-                  };
-
         // if tag is already in database, update it; if not, add it
-        if (Tags.Any(t => t.Uid == tag.Uid))
+        if (Tags.Any(t => t.Uid == CurrentTagUid))
         {
-            var entry = _tagContext.Tags.Single(t => t.Uid == tag.Uid);
-            entry.FullName = tag.FullName;
-            entry.Lrn      = tag.Lrn;
-
-            // remove and re-add to update the UI
-            Tags.Remove(tag);
-            Tags.Add(tag);
+            var entry = _tagContext.Tags.Single(t => t.Uid == CurrentTagUid);
+            entry.FullName = FullName;
+            entry.Lrn      = Lrn;
         }
         else
         {
-            _tagContext.Tags.Add(tag); // automagically updates the ObservableCollection
+            _tagContext.Tags.Add(new Tag
+                                 {
+                                     Uid      = CurrentTagUid ?? string.Empty,
+                                     FullName = FullName,
+                                     Lrn      = Lrn
+                                 }); // automagically updates the ObservableCollection
         }
 
         await _tagContext.SaveChangesAsync();
