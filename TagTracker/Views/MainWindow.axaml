@@ -50,7 +50,7 @@
                 <StackPanel Grid.Column="0"
                             Orientation="Horizontal"
                             Spacing="4">
-                    <Label VerticalAlignment="Center">RFID Serial Number</Label>
+                    <Label VerticalAlignment="Center">RFID UID</Label>
                     <TextBlock VerticalAlignment="Center"
                                FontFamily="monospace"
                                Text="{Binding CurrentTagUid}" />
@@ -67,7 +67,7 @@
                     <Label VerticalAlignment="Center">LRN</Label>
                     <TextBox Width="200" />
                 </StackPanel>
-                <Button Grid.Column="6">Add to Database</Button>
+                <Button Grid.Column="6">Update Tag Information</Button>
             </Grid>
             <TextBlock HorizontalAlignment="Center"
                        IsVisible="{Binding IsConnectedXorTagPresent}">
