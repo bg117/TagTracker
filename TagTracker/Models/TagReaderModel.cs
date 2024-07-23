@@ -5,11 +5,14 @@ namespace TagTracker.Models;
 
 public delegate void TagReceivedEventHandler(string tagUid);
 
+public delegate void DataReceivedEventHandler(string data);
+
 public partial class TagReaderModel
 {
     private readonly SerialPort _serialPort = new();
 
-    public event TagReceivedEventHandler? TagReceived;
+    public event TagReceivedEventHandler?  TagReceived;
+    public event DataReceivedEventHandler? DataReceived;
 
     public void Connect(string portName, int baudRate)
     {
@@ -26,6 +29,10 @@ public partial class TagReaderModel
     {
         // search for the pattern [A-Za-z0-9]{8|16|20} in the string
         var input = _serialPort.ReadExisting();
+
+        // send data to event handler
+        DataReceived?.Invoke(input);
+
         var regex = UidRegex();
         var match = regex.Match(input ?? string.Empty);
 

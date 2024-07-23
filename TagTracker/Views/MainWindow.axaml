@@ -106,6 +106,7 @@
         <TextBox Grid.Row="6"
                  IsReadOnly="True"
                  FontFamily="monospace"
-                 IsVisible="{Binding IsSerialMonitorOpen}" />
+                 IsVisible="{Binding IsSerialMonitorOpen}"
+                 Text="{Binding SerialMonitorData}" />
     </Grid>
 </Window>

@@ -45,6 +45,9 @@ public partial class MainWindowViewModel : ViewModelBase
     private int _selectedSerialPortIndex;
 
     [ObservableProperty]
+    private string _serialMonitorData = string.Empty;
+
+    [ObservableProperty]
     [NotifyCanExecuteChangedFor(nameof(ConnectOrDisconnectCommand))]
     private string[] _serialPorts = SerialPort.GetPortNames();
 
@@ -54,6 +57,7 @@ public partial class MainWindowViewModel : ViewModelBase
     public MainWindowViewModel()
     {
         _tagReaderModel.TagReceived       += OnTagReceived;
+        _tagReaderModel.DataReceived      += data => SerialMonitorData += data;
         _usbEventWatcher.UsbDeviceAdded   += OnUsbDevicesChanged;
         _usbEventWatcher.UsbDeviceRemoved += OnUsbDevicesChanged;
 
@@ -72,12 +76,6 @@ public partial class MainWindowViewModel : ViewModelBase
         110, 300, 600, 1200, 2400, 4800, 9600, 14400, 19200, 38400, 57600,
         115200
     ];
-
-    ~MainWindowViewModel()
-    {
-        _tagReaderModel.Disconnect();
-        _usbEventWatcher.Dispose();
-    }
 
     private async void OnUsbDevicesChanged(object? sender, UsbDevice e)
     {
@@ -129,6 +127,7 @@ public partial class MainWindowViewModel : ViewModelBase
         IsConnected         = false;
         CurrentTagUid       = null;
         IsSerialMonitorOpen = false;
+        SerialMonitorData   = string.Empty;
     }
 
     [RelayCommand(CanExecute = nameof(CanUpsertTag))]
