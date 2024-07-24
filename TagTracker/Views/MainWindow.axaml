@@ -50,7 +50,8 @@
                         Content="{Binding IsConnected,Converter={StaticResource BooleanToConnectDisconnectConverter}}" />
             </avalonia:SpacedGrid>
         </sukiUi:GlassCard>
-        <sukiUi:SukiSideMenu Grid.Row="1">
+        <sukiUi:SukiSideMenu Grid.Row="1"
+                             IsMenuExpanded="False">
             <sukiUi:SukiSideMenu.Items>
                 <sukiUi:SukiSideMenuItem Header="Database">
                     <sukiUi:SukiSideMenuItem.Icon>
