@@ -7,6 +7,7 @@
                    xmlns:sukiUi="clr-namespace:SukiUI.Controls;assembly=SukiUI"
                    xmlns:avalonia="clr-namespace:SpacedGridControl.Avalonia;assembly=SpacedGridControl.Avalonia"
                    mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
+                   xmlns:i="https://github.com/projektanker/icons.avalonia"
                    x:Class="TagTracker.Views.MainWindow"
                    x:DataType="vm:MainWindowViewModel"
                    Title="TagTracker">
@@ -52,6 +53,9 @@
         <sukiUi:SukiSideMenu Grid.Row="1">
             <sukiUi:SukiSideMenu.Items>
                 <sukiUi:SukiSideMenuItem Header="Database">
+                    <sukiUi:SukiSideMenuItem.Icon>
+                        <i:Icon Value="fa-solid fa-database" />
+                    </sukiUi:SukiSideMenuItem.Icon>
                     <sukiUi:SukiSideMenuItem.PageContent>
                         <avalonia:SpacedGrid ColumnSpacing="12"
                                              ColumnDefinitions="*,Auto"
@@ -143,6 +147,9 @@
                     </sukiUi:SukiSideMenuItem.PageContent>
                 </sukiUi:SukiSideMenuItem>
                 <sukiUi:SukiSideMenuItem Header="Serial Monitor">
+                    <sukiUi:SukiSideMenuItem.Icon>
+                        <i:Icon Value="fa-solid fa-desktop" />
+                    </sukiUi:SukiSideMenuItem.Icon>
                     <sukiUi:SukiSideMenuItem.PageContent>
                         <sukiUi:GlassCard Margin="16">
                             <TextBox IsReadOnly="True"
