@@ -61,7 +61,8 @@
                                                  VerticalAlignment="Stretch">
                                     <DataGrid ItemsSource="{Binding Tags}"
                                               AutoGenerateColumns="False"
-                                              VerticalAlignment="Stretch">
+                                              VerticalAlignment="Stretch"
+                                              IsReadOnly="True">
                                         <DataGrid.Columns>
                                             <DataGridTextColumn
                                                 Binding="{Binding Uid}"
@@ -146,7 +147,8 @@
                         <sukiUi:GlassCard Margin="16">
                             <TextBox IsReadOnly="True"
                                      FontFamily="monospace"
-                                     Text="{Binding SerialMonitorData}" />
+                                     Text="{Binding SerialMonitorData}"
+                                     VerticalContentAlignment="Top" />
                         </sukiUi:GlassCard>
                     </sukiUi:SukiSideMenuItem.PageContent>
                 </sukiUi:SukiSideMenuItem>
