@@ -61,9 +61,11 @@
                                              ColumnDefinitions="*,Auto"
                                              Margin="12">
                             <sukiUi:GlassCard Grid.Column="0">
-                                <sukiUi:GroupBox Header="Database"
-                                                 VerticalAlignment="Stretch">
-                                    <DataGrid ItemsSource="{Binding Tags}"
+                                <Grid RowDefinitions="Auto,*">
+                                    <sukiUi:GroupBox Grid.Row="0"
+                                        Header="Database" />
+                                    <DataGrid Grid.Row="1"
+                                              ItemsSource="{Binding Tags}"
                                               AutoGenerateColumns="False"
                                               VerticalAlignment="Stretch"
                                               IsReadOnly="True">
@@ -79,15 +81,17 @@
                                                 Header="LRN" />
                                         </DataGrid.Columns>
                                     </DataGrid>
-                                </sukiUi:GroupBox>
+                                </Grid>
                             </sukiUi:GlassCard>
                             <sukiUi:GlassCard Grid.Column="1"
                                               IsVisible="{Binding 
                             IsConnected}"
                                               Width="350"
                                               HorizontalAlignment="Right">
-                                <sukiUi:GroupBox Header="Metadata">
-                                    <Panel>
+                                <Grid RowDefinitions="Auto,*">
+                                    <sukiUi:GroupBox Grid.Row="0"
+                                        Header="Metadata" />
+                                    <Panel Grid.Row="1">
                                         <avalonia:SpacedGrid ColumnSpacing="8"
                                             RowSpacing="4"
                                             ColumnDefinitions="Auto,*"
@@ -141,7 +145,7 @@
                                             metadata
                                         </TextBlock>
                                     </Panel>
-                                </sukiUi:GroupBox>
+                                </Grid>
                             </sukiUi:GlassCard>
                         </avalonia:SpacedGrid>
                     </sukiUi:SukiSideMenuItem.PageContent>
@@ -151,11 +155,16 @@
                         <i:Icon Value="fa-solid fa-desktop" />
                     </sukiUi:SukiSideMenuItem.Icon>
                     <sukiUi:SukiSideMenuItem.PageContent>
-                        <sukiUi:GlassCard Margin="16">
-                            <TextBox IsReadOnly="True"
-                                     FontFamily="monospace"
-                                     Text="{Binding SerialMonitorData}"
-                                     VerticalContentAlignment="Top" />
+                        <sukiUi:GlassCard Margin="12">
+                            <Grid RowDefinitions="Auto,*">
+                                <sukiUi:GroupBox Grid.Row="0"
+                                                 Header="Serial Monitor" />
+                                <TextBox Grid.Row="1"
+                                         IsReadOnly="True"
+                                         Text="{Binding SerialMonitorData}"
+                                         VerticalAlignment="Stretch"
+                                         VerticalContentAlignment="Top" />
+                            </Grid>
                         </sukiUi:GlassCard>
                     </sukiUi:SukiSideMenuItem.PageContent>
                 </sukiUi:SukiSideMenuItem>
