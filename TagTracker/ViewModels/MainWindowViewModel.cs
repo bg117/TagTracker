@@ -1,4 +1,5 @@
 ﻿using System.Collections.ObjectModel;
+using System.ComponentModel.DataAnnotations;
 using System.IO.Ports;
 using System.Linq;
 using System.Threading.Tasks;
@@ -11,7 +12,7 @@ using Usb.Events;
 
 namespace TagTracker.ViewModels;
 
-public partial class MainWindowViewModel : ViewModelBase
+public partial class MainWindowViewModel : ObservableValidator
 {
     private readonly TagContext      _tagContext      = new();
     private readonly TagReaderModel  _tagReaderModel  = new();
@@ -32,6 +33,8 @@ public partial class MainWindowViewModel : ViewModelBase
     private bool _isSerialMonitorOpen;
 
     [ObservableProperty]
+    [NotifyDataErrorInfo]
+    [Range(100000000000, 999999999999, ErrorMessage = "LRN must be 12 digits long")]
     [NotifyCanExecuteChangedFor(nameof(UpsertTagCommand))]
     private string _lrn = string.Empty;
 
@@ -152,6 +155,7 @@ public partial class MainWindowViewModel : ViewModelBase
 
     private bool CanUpsertTag()
     {
-        return !string.IsNullOrEmpty(FullName) && !string.IsNullOrEmpty(Lrn);
+        return !string.IsNullOrEmpty(FullName) && !string.IsNullOrEmpty(Lrn) && !GetErrors
+                   (nameof(Lrn)).Any();
     }
 }
