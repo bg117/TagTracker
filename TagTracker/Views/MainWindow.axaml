@@ -57,9 +57,11 @@
                                              ColumnDefinitions="*,Auto"
                                              Margin="12">
                             <sukiUi:GlassCard Grid.Column="0">
-                                <sukiUi:GroupBox Header="Database">
+                                <sukiUi:GroupBox Header="Database"
+                                                 VerticalAlignment="Stretch">
                                     <DataGrid ItemsSource="{Binding Tags}"
-                                              AutoGenerateColumns="False">
+                                              AutoGenerateColumns="False"
+                                              VerticalAlignment="Stretch">
                                         <DataGrid.Columns>
                                             <DataGridTextColumn
                                                 Binding="{Binding Uid}"
