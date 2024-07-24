@@ -19,7 +19,6 @@ public partial class MainWindowViewModel : ViewModelBase
 
     [ObservableProperty]
     [NotifyPropertyChangedFor(nameof(IsTagPresent))]
-    [NotifyPropertyChangedFor(nameof(IsConnectedXorTagPresent))]
     private string? _currentTagUid;
 
     [ObservableProperty]
@@ -27,7 +26,6 @@ public partial class MainWindowViewModel : ViewModelBase
     private string _fullName = string.Empty;
 
     [ObservableProperty]
-    [NotifyPropertyChangedFor(nameof(IsConnectedXorTagPresent))]
     private bool _isConnected;
 
     [ObservableProperty]
@@ -68,8 +66,7 @@ public partial class MainWindowViewModel : ViewModelBase
         });
     }
 
-    public bool IsTagPresent             => CurrentTagUid != null;
-    public bool IsConnectedXorTagPresent => IsConnected   != IsTagPresent;
+    public bool IsTagPresent => CurrentTagUid != null;
 
     public int[] BaudRates =>
     [

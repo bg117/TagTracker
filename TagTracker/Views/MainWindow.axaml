@@ -1,13 +1,15 @@
-<Window xmlns="https://github.com/avaloniaui"
-        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-        xmlns:vm="using:TagTracker.ViewModels"
-        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
-        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-        xmlns:converters="clr-namespace:TagTracker.Converters;assembly=TagTracker"
-        mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
-        x:Class="TagTracker.Views.MainWindow"
-        x:DataType="vm:MainWindowViewModel"
-        Title="TagTracker">
+<sukiUi:SukiWindow xmlns="https://github.com/avaloniaui"
+                   xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+                   xmlns:vm="using:TagTracker.ViewModels"
+                   xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+                   xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+                   xmlns:converters="clr-namespace:TagTracker.Converters;assembly=TagTracker"
+                   xmlns:sukiUi="clr-namespace:SukiUI.Controls;assembly=SukiUI"
+                   xmlns:avalonia="clr-namespace:SpacedGridControl.Avalonia;assembly=SpacedGridControl.Avalonia"
+                   mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
+                   x:Class="TagTracker.Views.MainWindow"
+                   x:DataType="vm:MainWindowViewModel"
+                   Title="TagTracker">
 
     <Design.DataContext>
         <!-- This only sets the DataContext for the previewer in an IDE,
@@ -18,95 +20,135 @@
     <Window.Resources>
         <converters:BooleanToConnectDisconnectConverter
             x:Key="BooleanToConnectDisconnectConverter" />
-        <converters:BooleanToGridRowSpanConverter
-            x:Key="BooleanToGridRowSpanConverter" />
     </Window.Resources>
 
-    <Grid RowDefinitions="Auto,12,Auto,8,*,Auto,*"
-          Margin="8">
-        <Grid Row="0"
-              ColumnDefinitions="Auto,8,Auto,*,Auto,8,Auto">
-            <StackPanel Grid.Column="0"
-                        Orientation="Horizontal"
-                        Spacing="4">
-                <Label VerticalAlignment="Center">Serial Port</Label>
-                <ComboBox ItemsSource="{Binding SerialPorts}"
-                          SelectedIndex="{Binding SelectedSerialPortIndex}"
-                          Width="150" />
-            </StackPanel>
-            <StackPanel Grid.Column="2"
-                        Orientation="Horizontal"
-                        Spacing="4">
-                <Label VerticalAlignment="Center">Baud Rate</Label>
-                <ComboBox ItemsSource="{Binding BaudRates}"
-                          SelectedIndex="{Binding SelectedBaudRateIndex}"
-                          Width="100" />
-            </StackPanel>
-            <Button Grid.Column="4"
-                    Command="{Binding ConnectOrDisconnectCommand}"
-                    Content="{Binding IsConnected,Converter={StaticResource BooleanToConnectDisconnectConverter}}" />
-            <ToggleButton Grid.Column="6"
-                          IsChecked="{Binding IsSerialMonitorOpen}"
-                          IsEnabled="{Binding IsConnected}">
-                Serial Monitor
-            </ToggleButton>
-        </Grid>
-        <StackPanel Grid.Row="2">
-            <Grid ColumnDefinitions="Auto,8,Auto,8,Auto,*,Auto"
-                  IsVisible="{Binding IsTagPresent}">
+    <Grid RowDefinitions="Auto,*">
+        <sukiUi:GlassCard Grid.Row="0"
+                          CornerRadius="0"
+                          Padding="8">
+            <avalonia:SpacedGrid ColumnDefinitions="Auto,Auto,*,Auto"
+                                 ColumnSpacing="8">
                 <StackPanel Grid.Column="0"
                             Orientation="Horizontal"
                             Spacing="4">
-                    <Label VerticalAlignment="Center">RFID UID</Label>
-                    <TextBlock VerticalAlignment="Center"
-                               FontFamily="monospace"
-                               Text="{Binding CurrentTagUid}" />
+                    <TextBlock VerticalAlignment="Center">Serial Port</TextBlock>
+                    <ComboBox ItemsSource="{Binding SerialPorts}"
+                              SelectedIndex="{Binding SelectedSerialPortIndex}"
+                              Width="150" />
                 </StackPanel>
-                <StackPanel Grid.Column="2"
+                <StackPanel Grid.Column="1"
                             Orientation="Horizontal"
                             Spacing="4">
-                    <Label VerticalAlignment="Center">Name</Label>
-                    <TextBox Width="200"
-                             Text="{Binding FullName}" />
+                    <TextBlock VerticalAlignment="Center">Baud Rate</TextBlock>
+                    <ComboBox ItemsSource="{Binding BaudRates}"
+                              SelectedIndex="{Binding SelectedBaudRateIndex}"
+                              Width="150" />
                 </StackPanel>
-                <StackPanel Grid.Column="4"
-                            Orientation="Horizontal"
-                            Spacing="4">
-                    <Label VerticalAlignment="Center">LRN</Label>
-                    <TextBox Width="200"
-                             Text="{Binding Lrn}" />
-                </StackPanel>
-                <Button Grid.Column="6"
-                        Command="{Binding UpsertTagCommand}">
-                    Update Tag Information
-                </Button>
-            </Grid>
-            <TextBlock HorizontalAlignment="Center"
-                       IsVisible="{Binding IsConnectedXorTagPresent}">
-                Scan a tag to view and modify its information
-            </TextBlock>
-        </StackPanel>
-        <DataGrid Grid.Row="4"
-                  Grid.RowSpan="{Binding IsSerialMonitorOpen,Converter={StaticResource BooleanToGridRowSpanConverter}}"
-                  ItemsSource="{Binding Tags}"
-                  AutoGenerateColumns="False">
-            <DataGrid.Columns>
-                <DataGridTextColumn Binding="{Binding Uid}" Header="UID" />
-                <DataGridTextColumn Binding="{Binding FullName}"
-                                    Header="Full Name" />
-                <DataGridTextColumn Binding="{Binding Lrn}" Header="LRN" />
-            </DataGrid.Columns>
-        </DataGrid>
-        <GridSplitter Grid.Row="5"
-                      ResizeDirection="Rows"
-                      Height="3"
-                      Margin="0 2"
-                      Background="Gray"
-                      IsVisible="{Binding IsSerialMonitorOpen}" />
-        <TextBox Grid.Row="6"
-                 IsReadOnly="True"
-                 FontFamily="monospace"
-                 IsVisible="{Binding IsSerialMonitorOpen}"
-                 Text="{Binding SerialMonitorData}" />
+                <Button Grid.Column="3"
+                        Command="{Binding ConnectOrDisconnectCommand}"
+                        Content="{Binding IsConnected,Converter={StaticResource BooleanToConnectDisconnectConverter}}" />
+            </avalonia:SpacedGrid>
+        </sukiUi:GlassCard>
+        <sukiUi:SukiSideMenu Grid.Row="1">
+            <sukiUi:SukiSideMenu.Items>
+                <sukiUi:SukiSideMenuItem Header="Database">
+                    <sukiUi:SukiSideMenuItem.PageContent>
+                        <avalonia:SpacedGrid ColumnSpacing="12"
+                                             ColumnDefinitions="*,Auto"
+                                             Margin="12">
+                            <sukiUi:GlassCard Grid.Column="0">
+                                <sukiUi:GroupBox Header="Database">
+                                    <DataGrid ItemsSource="{Binding Tags}"
+                                              AutoGenerateColumns="False">
+                                        <DataGrid.Columns>
+                                            <DataGridTextColumn
+                                                Binding="{Binding Uid}"
+                                                Header="UID" />
+                                            <DataGridTextColumn
+                                                Binding="{Binding FullName}"
+                                                Header="Full Name" />
+                                            <DataGridTextColumn
+                                                Binding="{Binding Lrn}"
+                                                Header="LRN" />
+                                        </DataGrid.Columns>
+                                    </DataGrid>
+                                </sukiUi:GroupBox>
+                            </sukiUi:GlassCard>
+                            <sukiUi:GlassCard Grid.Column="1"
+                                              IsVisible="{Binding 
+                            IsConnected}"
+                                              Width="350"
+                                              HorizontalAlignment="Right">
+                                <sukiUi:GroupBox Header="Metadata">
+                                    <Panel>
+                                        <avalonia:SpacedGrid ColumnSpacing="8"
+                                            RowSpacing="4"
+                                            ColumnDefinitions="Auto,*"
+                                            RowDefinitions="Auto,Auto,
+                                                 Auto,Auto"
+                                            IsVisible="{Binding IsTagPresent}">
+                                            <TextBlock Grid.Row="0"
+                                                Grid.Column="0"
+                                                FontWeight="Bold"
+                                                VerticalAlignment="Center">
+                                                RFID UID
+                                            </TextBlock>
+                                            <TextBlock Grid.Row="0"
+                                                Grid.Column="1"
+                                                Text="{Binding CurrentTagUid}" />
+
+                                            <TextBlock Grid.Row="1"
+                                                Grid.Column="0"
+                                                FontWeight="Bold"
+                                                VerticalAlignment="Center">
+                                                Name
+                                            </TextBlock>
+                                            <TextBox Grid.Row="1"
+                                                Grid.Column="1"
+                                                Text="{Binding FullName}" />
+
+                                            <TextBlock Grid.Row="2"
+                                                Grid.Column="0"
+                                                FontWeight="Bold"
+                                                VerticalAlignment="Center">
+                                                LRN
+                                            </TextBlock>
+                                            <TextBox Grid.Row="2"
+                                                Grid.Column="1"
+                                                Text="{Binding Lrn}" />
+
+                                            <Button Grid.Row="3"
+                                                    Grid.Column="0"
+                                                    Grid.ColumnSpan="2"
+                                                    Command="{Binding UpsertTagCommand}">
+                                                Update Tag
+                                                Information
+                                            </Button>
+                                        </avalonia:SpacedGrid>
+                                        <TextBlock
+                                            IsVisible="{Binding 
+                               !IsTagPresent}"
+                                            TextAlignment="Center"
+                                            FontWeight="Bold">
+                                            Scan a tag to view and modify its
+                                            metadata
+                                        </TextBlock>
+                                    </Panel>
+                                </sukiUi:GroupBox>
+                            </sukiUi:GlassCard>
+                        </avalonia:SpacedGrid>
+                    </sukiUi:SukiSideMenuItem.PageContent>
+                </sukiUi:SukiSideMenuItem>
+                <sukiUi:SukiSideMenuItem Header="Serial Monitor">
+                    <sukiUi:SukiSideMenuItem.PageContent>
+                        <sukiUi:GlassCard Margin="16">
+                            <TextBox IsReadOnly="True"
+                                     FontFamily="monospace"
+                                     Text="{Binding SerialMonitorData}" />
+                        </sukiUi:GlassCard>
+                    </sukiUi:SukiSideMenuItem.PageContent>
+                </sukiUi:SukiSideMenuItem>
+            </sukiUi:SukiSideMenu.Items>
+        </sukiUi:SukiSideMenu>
     </Grid>
-</Window>
+</sukiUi:SukiWindow>
